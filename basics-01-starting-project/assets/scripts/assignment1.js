@@ -1,3 +1,5 @@
+// Variable Assignment
+
 let result;
 const userInput = 19;
 
