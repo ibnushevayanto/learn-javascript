@@ -24,38 +24,48 @@ function addLog(operationIdentifier, prevResult, enteredNumber, result) {
     console.table(logEntries)
 }
 
-function add() {
+function calculateResult(calculateType) {
     const enteredNumber = getUserInputValue();
     const initialResult = currentResult;
-    currentResult += enteredNumber;
-    addLog('ADD', initialResult, enteredNumber, currentResult)
-    writeOutput('+', initialResult, enteredNumber);
+    let mathOperator;
+    addLog(calculateType, initialResult, enteredNumber, currentResult)
+    if (calculateType === 'ADD') {
+        currentResult += enteredNumber;
+        mathOperator = "+";
+    } else if (calculateType === 'DECREASE') {
+        currentResult -= enteredNumber;
+        mathOperator = "-";
+    } else if (calculateType === 'MULTIPLY') {
+        currentResult *= enteredNumber;
+        mathOperator = "*";
+    } else if (calculateType === 'DIVIDE') {
+        currentResult /= enteredNumber;
+        mathOperator = "/";
+    }
+
+    if (typeof mathOperator !== 'undefined') {
+        writeOutput(mathOperator, initialResult, enteredNumber);
+    } else {
+        alert('Mohon Masukkan Format Yang Benar');
+    }
+
+}
+
+function add() {
+    calculateResult('ADD');
 }
 
 function min() {
-    const enteredNumber = getUserInputValue();
-    const initialResult = currentResult;
-    currentResult -= enteredNumber;
-    addLog('DECREASE', initialResult, enteredNumber, currentResult)
-    writeOutput('-', initialResult, enteredNumber);
+    calculateResult('DECREASE');
 }
 
 function multiply() {
-    const enteredNumber = getUserInputValue();
-    const initialResult = currentResult;
-    currentResult *= enteredNumber;
-    addLog('MULTIPLY', initialResult, enteredNumber, currentResult)
-    writeOutput('*', initialResult, enteredNumber);
+    calculateResult('MULTIPLY');
 }
 
 function divide() {
-    const enteredNumber = getUserInputValue();
-    const initialResult = currentResult;
-    currentResult /= enteredNumber;
-    addLog('DIVIDE', initialResult, enteredNumber, currentResult)
-    writeOutput('/', initialResult, enteredNumber);
+    calculateResult('DIV');
 }
-
 
 addBtn.addEventListener('click', add);
 subtractBtn.addEventListener('click', min)
