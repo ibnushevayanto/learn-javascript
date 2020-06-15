@@ -4,10 +4,24 @@ const MONSTER_ATTACK_VALUE = 15;
 const HEAL_VALUE = 20;
 let bonusLife = true;
 
-let setMaxHp = +prompt('Set Max Hp ', '100');
+function getMaxLifeValues() {
 
-if (isNaN(setMaxHp) || setMaxHp <= 0) {
+    const enteredValue = +prompt('Set Max Hp ', '100');
+
+    if (isNaN(enteredValue) || enteredValue <= 0) {
+        throw ({
+            message: 'Invalid user input'
+        });
+    }
+
+    return enteredValue;
+}
+let setMaxHp;
+try {
+    setMaxHp = getMaxLifeValues()
+} catch (error) {
     setMaxHp = 100
+    alert('Your value is invalid we use 100 for default value');
 }
 
 const MODE_ATTACK = 'ATTACK';
