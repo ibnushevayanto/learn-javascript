@@ -60,7 +60,40 @@ function writeLog(ev, val, monsterHealth, playerHealth) {
     }
 
     LOG.push(logEntry);
-    console.log(LOG);
+}
+
+function printBattleLog() {
+
+    // ! Normal For
+
+    // for (let index = 0; index < LOG.length; index++) {
+    //     console.log(LOG[index]);
+    // }
+
+    // ! do while
+
+    let j = 0;
+
+    outerWhile: do {
+        console.log(`do ${j}`);
+        innerFor: for (let k = 0; k < 5; k++) {
+            if (k === 3) {
+                break outerWhile;
+            }
+            console.log(`for ${k}`);
+        }
+        j++;
+    } while (j < 3);
+
+    // ! For OF
+    // let i = 0;
+    // for (const data of LOG) {
+    //     // console.log(`#${i}`)
+    //     for (const key in data) {
+    //         // console.log(LOG[0][key])
+    //     }
+    //     i++;
+    // }
 }
 
 function reset() {
@@ -150,3 +183,4 @@ function healPlayer() {
 attackBtn.addEventListener('click', normalAttack);
 strongAttackBtn.addEventListener('click', strongAttack);
 healBtn.addEventListener('click', healPlayer);
+logBtn.addEventListener('click', printBattleLog);
