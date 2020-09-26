@@ -16,12 +16,13 @@ function getMaxLifeValues() {
 
     return enteredValue;
 }
+
 let setMaxHp;
 try {
     setMaxHp = getMaxLifeValues()
 } catch (error) {
     setMaxHp = 100
-    alert('Your value is invalid we use 100 for default value');
+    alert(error.message);
 }
 
 const MODE_ATTACK = 'ATTACK';
