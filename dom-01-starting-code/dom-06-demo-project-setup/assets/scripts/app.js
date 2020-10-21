@@ -5,9 +5,63 @@ const cancelAddMovieBtn = addMovieModal.querySelector('.modal__actions').firstEl
 const confirmAddMovieBtn = cancelAddMovieBtn.nextElementSibling
 const userInput = document.getElementsByTagName('input')
 const entryText = document.getElementById('entry-text')
+const dialogConfirmationDelete = document.getElementById('delete-modal')
 const movies = []
 
-const rendererElement = (title, imageUrl, rating) => {
+const processDeleteMovie = function (id) {
+
+    console.log(id)
+
+    const moviesArr = movies.map(res => res.id)
+    const indexOfMovie = moviesArr.indexOf(id)
+
+    movies.splice(indexOfMovie, 1)
+
+    const movieList = document.querySelectorAll('.movie-element')
+    movieList[indexOfMovie].remove()
+}
+
+const showConfirmDeleteMovie = () => {
+    dialogConfirmationDelete.classList.add('visible')
+}
+
+const hideConfirmDeleteMovie = () => {
+    dialogConfirmationDelete.classList.remove('visible')
+}
+
+const cancelDeleteMovieHandler = function () {
+    hideBackdrop()
+    hideConfirmDeleteMovie()
+}
+
+const deleteMovie = function (id) {
+
+    // * Cara Agar Event Listener Tidak Tereksekusi 2 Kali
+
+    showConfirmDeleteMovie()
+    showBackdrop()
+    const cancelDeleteBtn = dialogConfirmationDelete.lastElementChild.firstElementChild
+
+    // * Cara Pertama
+    cancelDeleteBtn.removeEventListener('click', cancelDeleteMovieHandler)
+    cancelDeleteBtn.addEventListener('click', cancelDeleteMovieHandler)
+
+    let btnConfirm = cancelDeleteBtn.nextElementSibling
+
+    // * Cara Kedua
+    btnConfirm.replaceWith(btnConfirm.cloneNode(true))
+    btnConfirm = cancelDeleteBtn.nextElementSibling
+
+    btnConfirm.addEventListener('click', function () {
+        processDeleteMovie(id)
+        hideBackdrop()
+        hideConfirmDeleteMovie()
+        updateUI()
+        console.log(movies)
+    })
+}
+
+const rendererElement = (id, title, imageUrl, rating) => {
     const containerMovieList = document.getElementById('movie-list')
 
     const liItem = document.createElement('li')
@@ -25,13 +79,21 @@ const rendererElement = (title, imageUrl, rating) => {
     const ratingMovieInfo = document.createElement('p')
     ratingMovieInfo.innerText = `${rating}/5 stars`
 
-    containerMovieList.insertAdjacentElement('afterbegin', liItem)
+    const movieList = document.querySelectorAll('.movie-element')
+
+    if (movieList.length > 0) {
+        containerMovieList.lastElementChild.insertAdjacentElement('afterend', liItem)
+    } else {
+        containerMovieList.insertAdjacentElement('afterbegin', liItem)
+    }
+
     liItem.insertAdjacentElement('afterbegin', containerMovieImage)
     containerMovieImage.insertAdjacentElement('afterbegin', image)
     containerMovieImage.insertAdjacentElement('afterend', containerMovieInfo)
     containerMovieInfo.insertAdjacentElement('afterbegin', titleMovieInfo)
     titleMovieInfo.insertAdjacentElement('afterend', ratingMovieInfo)
 
+    liItem.addEventListener('click', deleteMovie.bind(null, id))
 }
 const updateUI = function () {
     if (movies.length === 0) {
@@ -40,12 +102,21 @@ const updateUI = function () {
         entryText.style.display = 'none'
     }
 }
-const checkBackdrop = function () {
-    backdrop.classList.toggle('visible')
+const showBackdrop = function () {
+    backdrop.classList.add('visible')
 }
-const toggleAddMovieModal = function () {
-    addMovieModal.classList.toggle('visible')
-    checkBackdrop()
+
+const hideBackdrop = function () {
+    backdrop.classList.remove('visible')
+}
+
+const hideMovieModal = function () {
+    addMovieModal.classList.remove('visible')
+}
+
+const showMovieModal = function () {
+    addMovieModal.classList.add('visible')
+    showBackdrop()
 }
 const clearInputHandler = function () {
     for (input of userInput) {
@@ -67,6 +138,7 @@ const addMovieHandler = function () {
     }
 
     const movie = {
+        id: Math.random().toString(),
         title: titleValue,
         imageUrl: imageUrlValue,
         rating: ratingValue
@@ -74,21 +146,24 @@ const addMovieHandler = function () {
 
     movies.push(movie)
 
-    toggleAddMovieModal()
+    hideMovieModal()
+    hideBackdrop()
     clearInputHandler()
     updateUI()
-    rendererElement(titleValue, imageUrlValue, ratingValue)
+    rendererElement(movie.id, titleValue, imageUrlValue, ratingValue)
 }
 const cancelMovieHandler = function () {
-    toggleAddMovieModal()
+    hideBackdrop()
     clearInputHandler()
 }
 const backdropHandler = function () {
-    toggleAddMovieModal()
+    hideMovieModal()
     clearInputHandler()
+    hideBackdrop()
+    hideConfirmDeleteMovie()
 }
 
-btnAddMovie.addEventListener('click', toggleAddMovieModal)
+btnAddMovie.addEventListener('click', showMovieModal)
 cancelAddMovieBtn.addEventListener('click', cancelMovieHandler)
 backdrop.addEventListener('click', backdropHandler)
 confirmAddMovieBtn.addEventListener('click', addMovieHandler)
