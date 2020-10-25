@@ -106,3 +106,42 @@ const arrToSort = [10.99, 2.22, 5.66, 7.88, 2.33, 2.22, 9.22]
 // ?    return number > 5
 // ? })
 // ? console.log(filterArr)
+
+// ! Array reduce()
+// ? const sum = arrToSort.reduce((prevValue, curValue, curIndex, prices) => {
+// ?    return prevValue + curValue
+// ? }, 0)
+// ? console.log(sum)
+
+// ! split() & join()
+// ? const data = 'Ibnu Shevayanto;26;05;2001'
+// ? const splitData = data.split(';')
+// ? console.log(splitData)
+
+const myName = ['Ibnu', 'Shevayanto', '19', '26 Mei 2001', 'Basketball']
+// ? const myNameInString = myName.join(' ')
+// ? console.log(myNameInString)
+
+const test = [{
+    name: 'Ibnu Shevayanto'
+}, {
+    name: 'Maximilian Super'
+}, {
+    name: 'Ibnu Sina'
+}]
+
+// * Filtering Example
+const filterTest = test.filter(res => {
+    const foundString = res.name.toLowerCase().search('ibnu'.toLowerCase())
+    if (foundString >= 0) {
+        return true
+    } else {
+        return false
+    }
+})
+
+console.log(filterTest)
+
+// * Array Destructing
+const [firstName, lastName, ...otherInformation] = myName
+console.log(firstName, lastName, otherInformation)
