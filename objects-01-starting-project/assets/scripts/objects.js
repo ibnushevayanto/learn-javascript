@@ -28,11 +28,8 @@ const renderAddMovie = (movie) => {
     movieEl.textContent = text
     movieEl.classList.add('movie-item')
 
-    if (movieItem.length > 0) {
-        movieList.insertAdjacentElement('beforeend', movieEl)
-    } else {
-        movieList.insertAdjacentElement('afterbegin', movieEl)
-    }
+    movieList.insertAdjacentElement('beforeend', movieEl)
+
 }
 
 const checkMovie = () => {
