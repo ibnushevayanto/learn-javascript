@@ -12,17 +12,76 @@ class Product {
     }
 }
 
-class ProductItem {
-    constructor(product) {
+class Component{
+
+    constructor(renderHookId){
+        this.hookid = renderHookId
+    }
+
+    createRootElement(tag, className, attributes){
+        const rootElement = document.createElement(tag)
+        if(className){
+            rootElement.className = className
+        }
+        if (attributes && attributes.length > 0) {
+            for(const attr of attributes){
+                rootElement.setAttribute(attr.name, attr.value)
+            }
+        }
+
+        document.getElementById(this.hookid).append(rootElement)
+        return rootElement
+    }
+}
+class ShoppingCart extends Component {
+    items = []
+
+    constructor(renderHookId){
+        super(renderHookId)
+    }
+
+    set cartItem(value){
+        this.items = value
+        this.totalOutput.innerText = `Total: \$${this.totalAmount ? this.totalAmount : 0}`
+    }
+
+    get totalAmount(){
+        const sum = this.items.reduce((prevValue, curValue) => prevValue + curValue.price, 0)
+        return sum.toFixed(2)
+    }
+
+    addProduct(product) {
+        const updatedItems = [...this.items]
+        updatedItems.push(product)
+        this.cartItem = updatedItems
+    }
+
+    render() {
+        const cartEl = this.createRootElement('section', 'cart')
+        const totalEl = document.createElement('h2')
+        const btnOrderEl = document.createElement('button')
+        this.totalOutput = totalEl
+        totalEl.innerText = `Total: $0`
+        btnOrderEl.innerText = 'Order Now!'
+
+        cartEl.append(totalEl)
+        cartEl.append(btnOrderEl)
+    }
+}
+
+class ProductItem extends Component {
+    constructor(product, renderHookId) {
+        super(renderHookId)
         this.product = product
     }
 
     addToCartHandler() {
-        console.log(this.product)
+        App.addProductToChart(this.product)
     }
 
     render() {
-        const elItemProduct = document.createElement('li')
+        const elItemProduct = this.createRootElement('li', 'product-item')
+
         const elContainerItemProduct = document.createElement('div')
         const elImageItemProduct = document.createElement('img')
         const elContainerDecriptionProduct = elContainerItemProduct.cloneNode(false)
@@ -31,7 +90,6 @@ class ProductItem {
         const elDescriptionProduct = document.createElement('p')
         const elBtnAddToCart = document.createElement('button')
 
-        elItemProduct.classList.add('product-item')
         elImageItemProduct.setAttribute('src', this.product.imageUrl)
         elContainerDecriptionProduct.classList.add('product-item__content')
         elTitleProduct.textContent = this.product.title
@@ -41,60 +99,58 @@ class ProductItem {
 
         elBtnAddToCart.addEventListener('click', this.addToCartHandler.bind(this))
 
-        return {
-            elItemProduct,
-            elContainerItemProduct,
-            elImageItemProduct,
-            elContainerDecriptionProduct,
-            elTitleProduct,
-            elPriceProduct,
-            elDescriptionProduct,
-            elBtnAddToCart
-        }
+        elItemProduct.appendChild(elContainerItemProduct)
+        elContainerItemProduct.appendChild(elImageItemProduct)
+        elContainerItemProduct.appendChild(elContainerDecriptionProduct)
+        elContainerDecriptionProduct.appendChild(elTitleProduct)
+        elContainerDecriptionProduct.appendChild(elPriceProduct)
+        elContainerDecriptionProduct.appendChild(elDescriptionProduct)
+        elContainerDecriptionProduct.appendChild(elBtnAddToCart)
     }
 }
-class ProductList {
+class ProductList extends Component {
     products = [
         new Product('Pillow', 'https://images.unsplash.com/photo-1592789705501-f9ae4278a9c9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'A soft pillow', 19.99),
         new Product('Carpet', 'https://images.unsplash.com/photo-1444362408440-274ecb6fc730?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'Nice carpet', 20.99)
     ]
 
-    constructor() {}
+    constructor(renderHookId) {
+        super(renderHookId)
+    }
 
     render() {
-        const renderHook = document.getElementById('app')
-        const prodList = document.createElement('ul')
-        prodList.classList.add('product-list')
+        this.createRootElement('ul', 'product-list', [{name:'id', value:'prod-list'}])
 
         for (const product of this.products) {
 
-            const productItem = new ProductItem(product)
-            const {
-                elItemProduct,
-                elContainerItemProduct,
-                elImageItemProduct,
-                elContainerDecriptionProduct,
-                elTitleProduct,
-                elPriceProduct,
-                elDescriptionProduct,
-                elBtnAddToCart
-            } = productItem.render()
-
-            elItemProduct.insertAdjacentElement('beforeend', elContainerItemProduct)
-            elContainerItemProduct.insertAdjacentElement('beforeend', elImageItemProduct)
-            elContainerItemProduct.insertAdjacentElement('beforeend', elContainerDecriptionProduct)
-            elContainerDecriptionProduct.insertAdjacentElement('beforeend', elTitleProduct)
-            elContainerDecriptionProduct.insertAdjacentElement('beforeend', elPriceProduct)
-            elContainerDecriptionProduct.insertAdjacentElement('beforeend', elDescriptionProduct)
-            elContainerDecriptionProduct.insertAdjacentElement('beforeend', elBtnAddToCart)
-
-            prodList.insertAdjacentElement('beforeend', elItemProduct)
+            const productItem = new ProductItem(product, 'prod-list')
+            productItem.render()
         }
-
-        renderHook.insertAdjacentElement('beforeend', prodList)
     }
 }
 
-const productList = new ProductList()
+class Shop {
+    constructor() {}
 
-productList.render()
+    render() {
+        this.cart = new ShoppingCart('app')
+        this.cart.render()
+        const productList = new ProductList('app')
+        productList.render()
+    }
+}
+
+class App {
+    static cart
+
+    static init() {
+        const shop = new Shop()
+        shop.render()
+        this.cart = shop.cart
+    }
+    static addProductToChart(product) {
+        this.cart.addProduct(product)
+    }
+}
+
+App.init()
