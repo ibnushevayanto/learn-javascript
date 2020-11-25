@@ -14,8 +14,11 @@ class Product {
 
 class Component{
 
-    constructor(renderHookId){
+    constructor(renderHookId, autoRender = true){
         this.hookid = renderHookId
+        if(autoRender){
+            this.render()
+        }
     }
 
     createRootElement(tag, className, attributes){
@@ -38,6 +41,7 @@ class ShoppingCart extends Component {
 
     constructor(renderHookId){
         super(renderHookId)
+        console.log('ok')
     }
 
     set cartItem(value){
@@ -56,6 +60,11 @@ class ShoppingCart extends Component {
         this.cartItem = updatedItems
     }
 
+    orderProduct(){
+        console.log('order...')
+        console.log(this.items)
+    }
+
     render() {
         const cartEl = this.createRootElement('section', 'cart')
         const totalEl = document.createElement('h2')
@@ -64,6 +73,8 @@ class ShoppingCart extends Component {
         totalEl.innerText = `Total: $0`
         btnOrderEl.innerText = 'Order Now!'
 
+        btnOrderEl.addEventListener('click', this.orderProduct.bind(this))
+
         cartEl.append(totalEl)
         cartEl.append(btnOrderEl)
     }
@@ -71,7 +82,7 @@ class ShoppingCart extends Component {
 
 class ProductItem extends Component {
     constructor(product, renderHookId) {
-        super(renderHookId)
+        super(renderHookId, false)
         this.product = product
     }
 
@@ -109,34 +120,47 @@ class ProductItem extends Component {
     }
 }
 class ProductList extends Component {
-    products = [
-        new Product('Pillow', 'https://images.unsplash.com/photo-1592789705501-f9ae4278a9c9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'A soft pillow', 19.99),
-        new Product('Carpet', 'https://images.unsplash.com/photo-1444362408440-274ecb6fc730?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'Nice carpet', 20.99)
-    ]
+    #_products = []
 
     constructor(renderHookId) {
-        super(renderHookId)
+        super(renderHookId, false)
+        this.fetchData()
     }
 
-    render() {
-        this.createRootElement('ul', 'product-list', [{name:'id', value:'prod-list'}])
+    fetchData(){
+        this.#_products = [
+            new Product('Pillow', 'https://images.unsplash.com/photo-1592789705501-f9ae4278a9c9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'A soft pillow', 19.99),
+            new Product('Carpet', 'https://images.unsplash.com/photo-1444362408440-274ecb6fc730?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60', 'Nice carpet', 20.99)
+        ]
 
-        for (const product of this.products) {
+        this.render()
+    }
+
+    #_renderProduct(){
+        for (const product of this.#_products) {
 
             const productItem = new ProductItem(product, 'prod-list')
             productItem.render()
         }
     }
+
+    render() {
+        this.createRootElement('ul', 'product-list', [{name:'id', value:'prod-list'}])
+
+        if(this.#_products && this.#_products.length > 0){
+            this.#_renderProduct()
+        }
+    }
 }
 
 class Shop {
-    constructor() {}
+    constructor() {
+        this.render()
+    }
 
     render() {
         this.cart = new ShoppingCart('app')
-        this.cart.render()
-        const productList = new ProductList('app')
-        productList.render()
+        new ProductList('app')
     }
 }
 
@@ -145,7 +169,6 @@ class App {
 
     static init() {
         const shop = new Shop()
-        shop.render()
         this.cart = shop.cart
     }
     static addProductToChart(product) {
@@ -154,3 +177,14 @@ class App {
 }
 
 App.init()
+
+
+class Person {
+    constructor(name){
+        this.name = name
+    }
+}
+
+const person = new Person('ibnu')
+// * untuk mengecheck terbuat dari class apa gunakan instanceof
+console.log(person instanceof Person)
