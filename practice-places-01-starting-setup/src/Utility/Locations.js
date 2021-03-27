@@ -1,20 +1,34 @@
-export async function getAddress(address){
-    const response = await fetch(`https://nominatim.openstreetmap.org/search.php?q=${address}&format=jsonv2`)
+export async function getAddressFromCoords(coords) {
+  const response = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=AIzaSyBXQ78cWlJQh-j9bt0-2Aqqhdxo2v9vWQs`
+  );
 
-    if(!response.ok){
-        throw new Error('Failed to fetch address')
-    }
+  if (!response.ok) {
+    throw new Error("Failed to fetch address, please try again");
+  }
+  const data = await response.json();
+  if (data.error_message) {
+    throw new Error(data.error_message);
+  }
 
-    const data = await response.json()
+  const address = data.results[0].formatted_address
+  return address;
+}
 
-    if(data.error_message){
-        throw new Error(data.error_message)
-    }
+export async function getCoordsFromAddress(address) {
+  const urlAddress = encodeURI(address);
+  const response = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${urlAddress}&key=AIzaSyBXQ78cWlJQh-j9bt0-2Aqqhdxo2v9vWQs`
+  );
 
-    if(data.length){
-        const coordinates = {latitude: data[0].lat, longitude: data[0].lon}
-        return coordinates
-    }else{
-        throw new Error({message: 'Data tidak ditemukan'})
-    }
+  if (!response.ok) {
+    throw new Error("Failed to fetch address, please try again");
+  }
+  const data = await response.json();
+  if (data.error_message) {
+    throw new Error(data.error_message);
+  }
+
+  const coordinates = data.results[0].geometry.location;
+  return coordinates;
 }

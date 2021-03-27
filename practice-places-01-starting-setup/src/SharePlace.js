@@ -1,63 +1,94 @@
-import Modal from "./UI/Modal";
-import Map from "./UI/Map";
-import { getAddress } from "./Utility/Locations";
-
+import { Modal } from "./UI/Modal";
+import { Map } from "./UI/Map";
+import {
+  getCoordsFromAddress,
+  getAddressFromCoords,
+} from "./Utility/Locations";
 class SharePlace {
   constructor() {
-    const formAddress = document.querySelector("form");
-    const locateBtn = document.getElementById("locate-btn");
+    const addressForm = document.querySelector("form");
+    const locateUserBtn = document.getElementById("locate-btn");
+    this.shareBtn = document.getElementById("share-btn");
 
-    locateBtn.addEventListener("click", this.getMyPlace.bind(this));
-    formAddress.addEventListener("submit", this.submitFormHandler.bind(this));
-
-    this.map = new Map()
-  }
-  selectPlace(coordinates) {
-    this.map.render(coordinates)
-  }
-  getMyPlace() {
-    const modalEl = new Modal(
-      "loading-modal-content",
-      "Loading location - please wait"
+    locateUserBtn.addEventListener(
+      "click",
+      this.getCurrentLocationHandler.bind(this)
     );
-    if (navigator.geolocation) {
-      modalEl.show();
-      navigator.geolocation.getCurrentPosition(
-        (res) => {
-          modalEl.hide();
-          const position = {
-            latitude: res.coords.latitude,
-            longitude: res.coords.longitude,
-          };
-          this.selectPlace(position);
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
-    } else {
-      alert("Your browser not support this feature");
+    addressForm.addEventListener("submit", this.findAddressHandler.bind(this));
+    this.shareBtn.addEventListener("click", this.shareMapHandler);
+  }
+  shareMapHandler() {
+    const sharedLink = document.getElementById("share-link");
+    if (!navigator.clipboard) {
+      shareLinkInput.select();
       return;
     }
+    navigator.clipboard
+      .writeText(sharedLink.value)
+      .then((res) => {
+        alert("Copied into clipboard");
+      })
+      .catch((err) => {
+        alert("Failed copy url into clipboard");
+      });
   }
-  async submitFormHandler(e) {
-    e.preventDefault();
-    const value = e.target.querySelector("input").value;
-    const modalEl = new Modal(
-      "loading-modal-content",
-      "Loading location - please wait"
-    );
+  selectPlace(coordinates, address) {
+    if (this.map) {
+      this.map.render(coordinates);
+    } else {
+      this.map = new Map(coordinates);
+    }
 
-    modalEl.show();
+    this.shareBtn.disabled = false;
+    const shareLinkInput = document.getElementById("share-link");
+    shareLinkInput.value = `${location.origin}/my-place?address=${encodeURI(
+      address
+    )}&lat=${coordinates.lat}&lng=${coordinates.lng}`;
+  }
+  getCurrentLocationHandler() {
+    if (!navigator.geolocation) {
+      alert("Please update your browser or use chrome");
+      return;
+    }
+
+    const modal = new Modal("loading-modal-content", "test");
+    modal.show();
+
+    navigator.geolocation.getCurrentPosition(
+      async (success) => {
+        modal.hide();
+        const coordinates = {
+          lat: success.coords.latitude,
+          lng: success.coords.longitude,
+        };
+        const address = await getAddressFromCoords(coordinates);
+        this.selectPlace(coordinates, address);
+      },
+      (error) => {
+        alert("Gagal mendapatkan lokasi");
+      }
+    );
+  }
+  async findAddressHandler(e) {
+    e.preventDefault();
+
+    const address = e.target.querySelector("input").value;
+    if (!address || address.trim().length === 0) {
+      alert("Invalid address");
+      return;
+    }
+
+    const modal = new Modal("loading-modal-content", "test");
+    modal.show();
+
     try {
-      const coordinates = await getAddress(value);
-      this.selectPlace(coordinates);
+      const coordinates = await getCoordsFromAddress(address);
+      this.selectPlace(coordinates, address);
     } catch (error) {
       console.log(error);
     }
-
-    modalEl.hide();
+    modal.hide();
   }
 }
 
-const sharePlaceClass = new SharePlace();
+new SharePlace();

@@ -1,29 +1,36 @@
-export default class Modal {
-    constructor (templateId, fallbackText) {
-        this.templateElement = document.getElementById(templateId)
-        this.modalTemplate = document.getElementById('modal-template')
-        this.fallbackText = fallbackText
-    }
-    show(){
-        if ('content' in document.createElement('template')) {
-            const modalContainer = document.importNode(this.modalTemplate.content, true)
-            this.modal = modalContainer.querySelector('.modal')
-            this.backdrop = modalContainer.querySelector('.backdrop')
-            const content = document.importNode(this.templateElement.content, true)
+export class Modal {
+  constructor(contentid, fallbackText) {
+    this.fallbackText = fallbackText;
+    this.contentTemplateEl = document.getElementById(contentid);
+    this.modalTemplateEl = document.getElementById("modal-template");
+  }
+  show() {
+    if ("content" in document.createElement("template")) {
+      const modalElements = document.importNode(
+        this.modalTemplateEl.content,
+        true
+      );
+      this.modalElement = modalElements.querySelector(".modal");
+      this.backdropElement = modalElements.querySelector(".backdrop");
 
-            this.modal.appendChild(content)
+      const contentElement = document.importNode(
+        this.contentTemplateEl.content,
+        true
+      );
+      this.modalElement.append(contentElement);
 
-            document.body.insertAdjacentElement('afterbegin', this.modal)
-            document.body.insertAdjacentElement('afterbegin', this.backdrop)
-
-        }else{
-            alert('Error')
-        }
+      document.body.insertAdjacentElement("afterbegin", this.modalElement);
+      document.body.insertAdjacentElement("afterbegin", this.backdropElement);
+    } else {
+      alert("Please update your browser or use chrome");
     }
-    hide(){
-        if(this.modal){
-            this.modal.remove()
-            this.backdrop.remove()
-        }
+  }
+  hide() {
+    if (this.modalElement) {
+      document.body.removeChild(this.modalElement);
+      document.body.removeChild(this.backdropElement);
+      this.modalElement = null;
+      this.backdropElement = null;
     }
+  }
 }
