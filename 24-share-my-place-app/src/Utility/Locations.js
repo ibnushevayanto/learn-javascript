@@ -1,6 +1,6 @@
 export async function getAddressFromCoords(coords) {
   const response = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=AIzaSyD-hRjPf6WC2iKPTkyaYS186VqD98_FLLg`
+    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=API_KEY_GOOGLE_MAP`
   );
 
   if (!response.ok) {
@@ -18,7 +18,7 @@ export async function getAddressFromCoords(coords) {
 export async function getCoordsFromAddress(address) {
   const urlAddress = encodeURI(address);
   const response = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?address=${urlAddress}&key=AIzaSyD-hRjPf6WC2iKPTkyaYS186VqD98_FLLg`
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${urlAddress}&key=API_KEY_GOOGLE_MAP`
   );
 
   if (!response.ok) {
