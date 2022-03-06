@@ -1,9 +1,9 @@
-import { Modal } from "./UI/Modal";
-import { Map } from "./UI/Map";
+import { Modal } from "./UI/Modal.js";
+import { Map } from "./UI/Map.js";
 import {
   getCoordsFromAddress,
   getAddressFromCoords,
-} from "./Utility/Locations";
+} from "./Utility/Locations.js";
 class SharePlace {
   constructor() {
     const addressForm = document.querySelector("form");
