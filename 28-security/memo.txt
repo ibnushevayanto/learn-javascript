@@ -1,0 +1,6 @@
+Catatan Security Untuk Javascript : 
+
+1. Jangan meletakkan API_KEY dan sejenisnya di code
+2. Untuk menghindari xss attack, hindari penggunaan innertHTML, innertHTML digunakan jika memang sangat dibutuhkan
+3. Untuk mensanitize string html, bisa menggunakan package sanitize-html 
+4. Perhatikan saat menginstall package nodejs (npm install), perhatikan jika ada Vulnabilities, berarti ada package yang rentan serangan hacker
